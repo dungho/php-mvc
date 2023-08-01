@@ -1,0 +1,50 @@
+version: '3'
+services:
+  pure_php_app:
+    image: webdevops/php-apache:7.4
+    container_name: mvc_php_app
+    volumes:
+      - ../:/app
+      # - ./php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - pure_php_nw
+    ports:
+      - 8585:80
+    links:
+      - pure_php_db:db
+
+  # pure_php_web:
+  #   image: httpd:2.4
+  #   container_name: pure_php_web
+  #   ports:
+  #     - 8585:80
+  #   volumes:
+  #     - ../:/var/www
+  #     - ./apache/default.conf:/usr/local/apache2/conf/default.conf
+  #   networks:
+  #     - pure_php_nw
+  #   depends_on:
+  #     - pure_php_app
+
+  pure_php_db:
+    image: mysql:8
+    container_name: pure_php_db
+    command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - 33040:3306
+    environment:
+      MYSQL_DATABASE: pure_php
+      MYSQL_ROOT_PASSWORD: password
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    networks:
+      - pure_php_nw
+    volumes:
+      - pure-php-mysql:/var/lib/mysql
+      - ./my.cnf:/etc/mysql/conf.d/my.cnf
+
+networks:
+  pure_php_nw:
+    driver: bridge
+volumes:
+  pure-php-mysql: {}
